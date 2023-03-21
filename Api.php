@@ -31,11 +31,6 @@
 						('', ?, ?, ?, NULL, NULL, ?, ?, 'F', NULL, NULL)");
 						$stmt->bind_param("sssss", $nome, $username, $password, $cognome, $email);
 						
-						/*$stmt = $conn->prepare("INSERT INTO azienda (username, email, password, nome, cognome) VALUES (?, ?, ?, ?, ?)");
-						$stmt->bind_param("sssss", $username, $email, $password, $nome, $cognome);*/
-
-
-
 						if($stmt->execute()){
 							$stmt = $conn->prepare("SELECT pk_azienda, login, email, nome, cognome FROM azienda WHERE login = ?"); 
 							$stmt->bind_param("s",$username);
@@ -102,6 +97,19 @@
 					}
 				}
 			break; 
+
+			case 'qrcode':
+				if(isTheseParametersAvailable(array('qrSUT', 'qrAIRR'))){
+					
+					$qrSUT = $_POST['qrSUT'];
+					$qrAIRR = $_POST['qrAIRR'];
+					
+					$stmt = $conn->prepare("INSERT INTO `controlla` (`fk_sensore`, `fk_attuatore`) VALUES (?, ?)");
+					$stmt->bind_param("ss",$qrSUT, $qrAIRR);
+					$stmt->execute();
+				}
+			
+			break;
 			
 			default: 
 				$response['error'] = true; 
