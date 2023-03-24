@@ -16,7 +16,7 @@
 					$nome = $_POST['nome']; 
 					$cognome = $_POST['cognome']; 
 					
-					$stmt = $conn->prepare("SELECT pk_azienda FROM azienda WHERE login = ? OR email = ?");
+					$stmt = $conn->prepare("SELECT pk_azienda FROM AZIENDA WHERE login = ? OR email = ?");
 					$stmt->bind_param("ss", $username, $email);
 					$stmt->execute();
 					$stmt->store_result();
@@ -26,13 +26,13 @@
 						$response['message'] = 'User already registered';
 						$stmt->close();
 					}else{
-						$stmt = $conn->prepare("INSERT INTO `azienda` 
+						$stmt = $conn->prepare("INSERT INTO `AZIENDA` 
 						(`pk_azienda`, `nome`, `login`, `pwd`, `lat`, `lon`, `cognome`, `email`, `emailVerificata`, `tipoUtente`, `sempreConnesso`) VALUES 
 						('', ?, ?, ?, NULL, NULL, ?, ?, 'F', NULL, NULL)");
 						$stmt->bind_param("sssss", $nome, $username, $password, $cognome, $email);
 						
 						if($stmt->execute()){
-							$stmt = $conn->prepare("SELECT pk_azienda, login, email, nome, cognome FROM azienda WHERE login = ?"); 
+							$stmt = $conn->prepare("SELECT pk_azienda, login, email, nome, cognome FROM AZIENDA WHERE login = ?"); 
 							$stmt->bind_param("s",$username);
 							$stmt->execute();
 							$stmt->bind_result($id, $username, $email, $nome, $cognome);
@@ -67,7 +67,7 @@
 					$username = $_POST['username'];
 					$password = md5($_POST['password']); 
 					
-					$stmt = $conn->prepare("SELECT pk_azienda, login, email, nome, cognome FROM azienda WHERE login = ? AND pwd = ?");
+					$stmt = $conn->prepare("SELECT pk_azienda, login, email, nome, cognome FROM AZIENDA WHERE login = ? AND pwd = ?");
 					$stmt->bind_param("ss",$username, $password);
 					
 					
