@@ -23,7 +23,7 @@
 					
 					if($stmt->num_rows > 0){
 						$response['error'] = true;
-						$response['message'] = 'User already registered';
+						$response['message'] = 'Utente già registrato';
 						$stmt->close();
 					}else{
 						$stmt = $conn->prepare("INSERT INTO `AZIENDA` 
@@ -49,14 +49,14 @@
 							$stmt->close();
 							
 							$response['error'] = false; 
-							$response['message'] = 'User registered successfully'; 
+							$response['message'] = 'Registrazione avvenuta con successo'; 
 							$response['user'] = $user; 
 						}
 					}
 					
 				}else{
 					$response['error'] = true; 
-					$response['message'] = 'required parameters are not available'; 
+					$response['message'] = 'i parametri richiesti non sono disponibili'; 
 				}
 				
 			break; 
@@ -89,11 +89,11 @@
 						);
 						
 						$response['error'] = false; 
-						$response['message'] = 'username successfull'; 
+						$response['message'] = 'Login effettuato'; 
 						$response['user'] = $user; 
 					}else{
 						$response['error'] = false; 
-						$response['message'] = 'Invalid username or password';
+						$response['message'] = 'Username o password non validi';
 					}
 				}
 			break; 
@@ -104,9 +104,23 @@
 					$qrSUT = $_POST['qrSUT'];
 					$qrAIRR = $_POST['qrAIRR'];
 					
-					$stmt = $conn->prepare("INSERT INTO `controlla` (`fk_sensore`, `fk_attuatore`) VALUES (?, ?)");
-					$stmt->bind_param("ss",$qrSUT, $qrAIRR);
+					$stmt = $conn->pepare("SELECT fk_sensore, fk_attuatore FROM controlla WHERE fk_sensore = ? AND fk_attuatore = ?");
+					$stmt->bind_param("ss", $qrSUT, $qrAIRR);
 					$stmt->execute();
+					$stmt->store_result();
+					
+					if($stmt->num_rows > 0){
+						$response['error'] = true;
+						$response['message'] = 'Coppia sensore-attuatore già registrata';
+						$stmt->close();
+					} else {
+						$stmt = $conn->prepare("INSERT INTO `controlla` (`fk_sensore`, `fk_attuatore`) VALUES (?, ?)");
+					$stmt->bind_param("ss",$qrSUT, $qrAIRR);
+					
+					if($stmt->execute()){
+						$response['error'] = false;
+						$response['message'] = 'Coppia sensore-attuatore registrata con successo';
+					}
 				}
 			
 			break;
