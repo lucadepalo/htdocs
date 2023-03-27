@@ -1,0 +1,11 @@
+/dashboard
+/img
+/webalizer
+/xampp
+/TEST
+*.html
+*.txt
+*.ico
+*.css
+index.php
+login.php
