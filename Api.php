@@ -104,7 +104,7 @@
 					$qrSUT = $_POST['qrSUT'];
 					$qrAIRR = $_POST['qrAIRR'];
 					
-					$stmt = $conn->pepare("SELECT fk_sensore, fk_attuatore FROM controlla WHERE fk_sensore = ? AND fk_attuatore = ?");
+					$stmt = $conn->prepare("SELECT fk_sensore, fk_attuatore FROM controlla WHERE fk_sensore = ? AND fk_attuatore = ?");
 					$stmt->bind_param("ss", $qrSUT, $qrAIRR);
 					$stmt->execute();
 					$stmt->store_result();
@@ -115,11 +115,12 @@
 						$stmt->close();
 					} else {
 						$stmt = $conn->prepare("INSERT INTO `controlla` (`fk_sensore`, `fk_attuatore`) VALUES (?, ?)");
-					$stmt->bind_param("ss",$qrSUT, $qrAIRR);
+						$stmt->bind_param("ss",$qrSUT, $qrAIRR);
 					
-					if($stmt->execute()){
-						$response['error'] = false;
-						$response['message'] = 'Coppia sensore-attuatore registrata con successo';
+						if($stmt->execute()){
+							$response['error'] = false;
+							$response['message'] = 'Coppia sensore-attuatore registrata con successo';
+						}
 					}
 				}
 			
