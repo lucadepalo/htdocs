@@ -125,6 +125,19 @@
 				}
 			
 			break;
+
+			case 'croplist':
+				$stmt = $conn->prepare("SELECT pk_specie, nome FROM SPECIE");
+				$stmt->execute();
+				$result = $stmt->get_result();
+				$speciesMap = array();
+				while ($row = $result->fetch_assoc()) {
+					$speciesMap[$row['pk_specie']] = $row['nome'];
+				}
+				$response['error'] = false;
+				$response['message'] = 'Species retrieved successfully';
+				$response['species'] = $speciesMap;
+			break;
 			
 			default: 
 				$response['error'] = true; 
