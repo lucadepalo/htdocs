@@ -127,17 +127,22 @@
 			break;
 			
 			case 'suggest':
-				$stmt = $conn->prepare("SELECT SINERGIA.fk_specie2, SPECIE.nome FROM SINERGIA INNER JOIN SPECIE ON SINERGIA.fk_specie2 = SPECIE.pk_specie WHERE SINERGIA.fk_specie1 = ? AND SINERGIA.grado = 1");
-				$stmt->bind_param("i", $fk_specie1);
-				$stmt->execute();
-				$stmt->store_result();
-				$speciesMap = array();
-				while ($row = $result->fetch_assoc()) {
-					$speciesMap[$row['pk_specie2']] = $row['nome'];
+				if(isTheseParametersAvailable(array('fk_specie1'))){
+					$stmt = $conn->prepare("SELECT SINERGIA.fk_specie2, SPECIE.nome FROM SINERGIA INNER JOIN SPECIE ON SINERGIA.fk_specie2 = SPECIE.pk_specie WHERE SINERGIA.fk_specie1 = ? AND SINERGIA.grado = 1");
+					$stmt->bind_param("i", $fk_specie1);
+					$stmt->execute();
+					$stmt->store_result();
+					$speciesMap = array();
+					while ($row = $result->fetch_assoc()) {
+						$speciesMap[$row['pk_specie2']] = $row['nome'];
+					}
+					$response['error'] = false;
+					$response['message'] = 'Synergic species retrieved successfully';
+					$response['species'] = $speciesMap;
+					echo $response;
+					echo json_encode($speciesMap);
 				}
-				$response['error'] = false;
-				$response['message'] = 'Species retrieved successfully';
-				$response['species'] = $speciesMap;
+
 			break;
 
 			case 'croplist':
@@ -151,6 +156,8 @@
 				$response['error'] = false;
 				$response['message'] = 'Species retrieved successfully';
 				$response['species'] = $speciesMap;
+				echo $response;
+				echo json_encode($speciesMap);
 			break;
 			
 			default: 
