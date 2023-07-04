@@ -128,22 +128,22 @@
 			
 			case 'suggest':
 				if(isTheseParametersAvailable(array('fk_specie1'))){
+					$fk_specie1 = $_POST['fk_specie1'];
 					$stmt = $conn->prepare("SELECT SINERGIA.fk_specie2, SPECIE.nome FROM SINERGIA INNER JOIN SPECIE ON SINERGIA.fk_specie2 = SPECIE.pk_specie WHERE SINERGIA.fk_specie1 = ? AND SINERGIA.grado = 1");
 					$stmt->bind_param("i", $fk_specie1);
 					$stmt->execute();
-					$stmt->store_result();
 					$speciesMap = array();
-					while ($row = $result->fetch_assoc()) {
-						$speciesMap[$row['pk_specie2']] = $row['nome'];
+					$stmt->bind_result($fk_specie2, $nome);
+					while ($stmt->fetch()) {
+						$speciesMap[$fk_specie2] = $nome;
 					}
 					$response['error'] = false;
 					$response['message'] = 'Synergic species retrieved successfully';
 					$response['species'] = $speciesMap;
-					echo $response;
-					echo json_encode($speciesMap);
+					echo json_encode($response);
 				}
-
 			break;
+
 
 			case 'croplist':
 				$stmt = $conn->prepare("SELECT pk_specie, nome FROM SPECIE");
@@ -156,8 +156,7 @@
 				$response['error'] = false;
 				$response['message'] = 'Species retrieved successfully';
 				$response['species'] = $speciesMap;
-				echo $response;
-				echo json_encode($speciesMap);
+				echo json_encode($response);
 			break;
 			
 			default: 
