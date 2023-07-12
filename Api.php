@@ -144,7 +144,6 @@
 				}
 			break;
 
-
 			case 'croplist':
 				$stmt = $conn->prepare("SELECT pk_specie, nome FROM SPECIE");
 				$stmt->execute();
@@ -157,6 +156,81 @@
 				$response['message'] = 'Species retrieved successfully';
 				$response['species'] = $speciesMap;
 				echo json_encode($response);
+			break;
+
+			case 'irriga':
+				if(isTheseParametersAvailable(array('fk_contenitore', 'fk_linea'))){
+					$fk_contenitore = $_POST['fk_contenitore'];
+					$fk_linea = $_POST['fk_linea'];
+					$stmt = $conn->prepare("SELECT fk_contenitore, fk_linea FROM irriga WHERE fk_contenitore = ? AND fk_linea = ?");
+					$stmt->bind_param("ii", $fk_contenitore, $fk_linea);
+					$stmt->execute();
+					$stmt->store_result();
+					
+					if($stmt->num_rows > 0){
+						$response['error'] = true;
+						$response['message'] = 'Linea di irrigazione già presente nel contenitore';
+						$stmt->close();
+					} else {
+						$stmt = $conn->prepare("INSERT INTO `irriga` (`fk_contenitore`, `fk_linea`) VALUES (?, ?)");
+						$stmt->bind_param("ii", $fk_contenitore, $fk_linea);
+					
+						if($stmt->execute()){
+							$response['error'] = false;
+							$response['message'] = 'Linea di irrigazione aggiunta correttamente al contenitore';
+						}
+					}
+				}
+			break;
+
+			case 'dispone':
+				if(isTheseParametersAvailable(array('fk_linea', 'fk_posto'))){
+					$fk_linea = $_POST['fk_linea'];
+					$fk_posto = $_POST['fk_posto'];
+					$stmt = $conn->prepare("SELECT fk_linea, fk_posto FROM dispone WHERE fk_linea = ? AND fk_posto = ?");
+					$stmt->bind_param("ii", $fk_linea, $fk_posto);
+					$stmt->execute();
+					$stmt->store_result();
+					
+					if($stmt->num_rows > 0){
+						$response['error'] = true;
+						$response['message'] = 'Posto già occupato nella linea di irrigazione';
+						$stmt->close();
+					} else {
+						$stmt = $conn->prepare("INSERT INTO `dispone` (`fk_linea`, `fk_posto`) VALUES (?, ?)");
+						$stmt->bind_param("ii", $fk_linea, $fk_posto);
+					
+						if($stmt->execute()){
+							$response['error'] = false;
+							$response['message'] = 'Posto aggiunto correttamente alla linea di irrigazione';
+						}
+					}
+				}
+			break;
+
+			case 'assegnata':
+				if(isTheseParametersAvailable(array('fk_posto', 'fk_specie'))){
+					$fk_posto = $_POST['fk_posto'];
+					$fk_specie = $_POST['fk_specie'];
+					$stmt = $conn->prepare("SELECT fk_posto, fk_specie FROM assegnata WHERE fk_posto = ? AND fk_specie = ?");
+					$stmt->bind_param("ii", $fk_posto, $fk_specie);
+					$stmt->execute();
+					$stmt->store_result();
+					
+					if($stmt->num_rows > 0){
+						$response['error'] = true;
+						$response['message'] = 'Specie già piantata nel posto indicato';
+						$stmt->close();
+					} else {
+						$stmt = $conn->prepare("INSERT INTO `assegnata`(`fk_ciclo_agrario`, `fk_posto`, `fk_specie`, `modo`) VALUES (NULL,?,?,NULL)");
+						$stmt->bind_param("ii", $fk_posto, $fk_specie);
+					
+						if($stmt->execute()){
+							$response['error'] = false;
+							$response['message'] = 'Specie correttamente assegnata al posto indicato';
+						}
+					}
+				}
 			break;
 			
 			default: 
