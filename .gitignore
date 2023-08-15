@@ -7,5 +7,6 @@
 *.txt
 *.ico
 *.css
+*.ignore
 index.php
-login.php
+login.php.other
