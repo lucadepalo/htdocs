@@ -26,12 +26,14 @@
 						$response['message'] = 'Utente già registrato';
 						$stmt->close();
 					}else{
+						$stmt->close();
 						$stmt = $conn->prepare("INSERT INTO `AZIENDA` 
 						(`pk_azienda`, `nome`, `login`, `pwd`, `lat`, `lon`, `cognome`, `email`, `emailVerificata`, `tipoUtente`, `sempreConnesso`) VALUES 
 						('', ?, ?, ?, NULL, NULL, ?, ?, 'F', NULL, NULL)");
 						$stmt->bind_param("sssss", $nome, $username, $password, $cognome, $email);
 						
 						if($stmt->execute()){
+							$stmt->close();
 							$stmt = $conn->prepare("SELECT pk_azienda, login, email, nome, cognome FROM AZIENDA WHERE login = ?"); 
 							$stmt->bind_param("s",$username);
 							$stmt->execute();
@@ -53,10 +55,11 @@
 							$response['user'] = $user; 
 						}
 					}
-					
+					echo json_encode($response);
 				}else{
 					$response['error'] = true; 
 					$response['message'] = 'i parametri richiesti non sono disponibili'; 
+					echo json_encode($response);
 				}
 				
 			break; 
@@ -95,6 +98,8 @@
 						$response['error'] = false; 
 						$response['message'] = 'Username o password non validi';
 					}
+					$stmt->close();
+					echo json_encode($response);
 				}
 			break; 
 
@@ -114,6 +119,7 @@
 						$response['message'] = 'Coppia sensore-attuatore già registrata';
 						$stmt->close();
 					} else {
+						$stmt->close();
 						$stmt = $conn->prepare("INSERT INTO `controlla` (`fk_sensore`, `fk_attuatore`) VALUES (?, ?)");
 						$stmt->bind_param("ss",$qrSUT, $qrAIRR);
 					
@@ -121,7 +127,9 @@
 							$response['error'] = false;
 							$response['message'] = 'Coppia sensore-attuatore registrata con successo';
 						}
+						$stmt->close();
 					}
+					echo json_encode($response);
 				}
 			
 			break;
@@ -137,6 +145,7 @@
 					while ($stmt->fetch()) {
 						$speciesMap[$fk_specie2] = $nome;
 					}
+					$stmt->close();
 					$response['error'] = false;
 					$response['message'] = 'Synergic species retrieved successfully';
 					$response['species'] = $speciesMap;
@@ -152,6 +161,7 @@
 				while ($row = $result->fetch_assoc()) {
 					$speciesMap[$row['pk_specie']] = $row['nome'];
 				}
+				$stmt->close();
 				$response['error'] = false;
 				$response['message'] = 'Species retrieved successfully';
 				$response['species'] = $speciesMap;
@@ -170,15 +180,19 @@
 					if($stmt->num_rows > 0){
 						$response['error'] = true;
 						$response['message'] = 'Linea di irrigazione già presente nel contenitore';
+						echo json_encode($response);
 						$stmt->close();
 					} else {
+						$stmt->close();
 						$stmt = $conn->prepare("INSERT INTO `irriga` (`fk_contenitore`, `fk_linea`) VALUES (?, ?)");
 						$stmt->bind_param("ii", $fk_contenitore, $fk_linea);
 					
 						if($stmt->execute()){
 							$response['error'] = false;
 							$response['message'] = 'Linea di irrigazione aggiunta correttamente al contenitore';
+							echo json_encode($response);
 						}
+						$stmt->close();
 					}
 				}
 			break;
@@ -197,13 +211,17 @@
 						$response['message'] = 'Posto già occupato nella linea di irrigazione';
 						$stmt->close();
 					} else {
+						$stmt->close();
 						$stmt = $conn->prepare("INSERT INTO `dispone` (`fk_linea`, `fk_posto`) VALUES (?, ?)");
 						$stmt->bind_param("ii", $fk_linea, $fk_posto);
 					
 						if($stmt->execute()){
 							$response['error'] = false;
 							$response['message'] = 'Posto aggiunto correttamente alla linea di irrigazione';
+							echo json_encode($response);
+
 						}
+						$stmt->close();
 					}
 				}
 			break;
@@ -220,15 +238,19 @@
 					if($stmt->num_rows > 0){
 						$response['error'] = true;
 						$response['message'] = 'Specie già piantata nel posto indicato';
+						echo json_encode($response);
 						$stmt->close();
 					} else {
+						$stmt->close();
 						$stmt = $conn->prepare("INSERT INTO `assegnata`(`fk_ciclo_agrario`, `fk_posto`, `fk_specie`, `modo`) VALUES (NULL,?,?,NULL)");
 						$stmt->bind_param("ii", $fk_posto, $fk_specie);
 					
 						if($stmt->execute()){
 							$response['error'] = false;
 							$response['message'] = 'Specie correttamente assegnata al posto indicato';
+							echo json_encode($response);
 						}
+						$stmt->close();
 					}
 				}
 			break;
@@ -236,14 +258,14 @@
 			default: 
 				$response['error'] = true; 
 				$response['message'] = 'Invalid Operation Called';
+				echo json_encode($response);
 		}
 		
 	}else{
 		$response['error'] = true; 
 		$response['message'] = 'Invalid API Call';
+		echo json_encode($response);
 	}
-	
-	echo json_encode($response);
 	
 	function isTheseParametersAvailable($params){
 		
@@ -254,3 +276,4 @@
 		}
 		return true; 
 	}
+?>
