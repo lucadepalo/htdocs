@@ -28,7 +28,8 @@
 		$stmt = $conn->prepare("SELECT fk_sensore, fk_attuatore FROM controlla WHERE fk_sensore = ? AND fk_attuatore = ?");
 		$stmt->bind_param("ss", $qrSUT, $qrAIRR);
 		$stmt->execute();
-		
+		$stmt->store_result();
+
 		if($stmt->num_rows > 0){
 			$response['error'] = true;
 			$response['message'] = 'Coppia sensore-attuatore già registrata';
