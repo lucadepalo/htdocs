@@ -20,11 +20,14 @@
 			return true; 
 		}
 
-	if(isTheseParametersAvailable(array('fk_linea', 'fk_posto'))){
+	if(isTheseParametersAvailable(array('pk_posto', 'numForo', 'fk_linea'))){
+	
+		$pk_posto = $_POST['pk_posto'];
+		$numForo = $_POST['numForo'];
 		$fk_linea = $_POST['fk_linea'];
-		$fk_posto = $_POST['fk_posto'];
-		$stmt = $conn->prepare("SELECT fk_linea, fk_posto FROM dispone WHERE fk_linea = ? AND fk_posto = ?");
-		$stmt->bind_param("ii", $fk_linea, $fk_posto);
+
+		$stmt = $conn->prepare("SELECT pk_posto, numForo, fk_linea FROM dispone WHERE fk_linea = ? AND fk_posto = ? AND numForo = ?");
+		$stmt->bind_param("iii", $fk_linea, $pk_posto, $numForo);
 		$stmt->execute();
 		$stmt->store_result();
 		
@@ -34,17 +37,23 @@
 			$stmt->close();
 		} else {
 			$stmt->close();
-			$stmt = $conn->prepare("INSERT INTO `dispone` (`fk_linea`, `fk_posto`) VALUES (?, ?)");
-			$stmt->bind_param("ii", $fk_linea, $fk_posto);
+			$stmt = $conn->prepare("INSERT INTO `POSTO`(`pk_posto`, `numForo`, `fk_linea`) VALUES (?, ?, ?)");
+			$stmt->bind_param("iii", $pk_posto, $numForo, $fk_linea);
 		
 			if($stmt->execute()){
 				$response['error'] = false;
 				$response['message'] = 'Posto aggiunto correttamente alla linea di irrigazione';
-				echo json_encode($response);
 
+			} else {
+				$response['error'] = true;
+				$response['message'] = 'Errore nella aggiunta del posto';
 			}
 			$stmt->close();
 		}
+	} else {
+		$response['error'] = true;
+		$response['message'] = 'Errore: parametri non disponibili';
 	}
+	echo json_encode($response);
 	
 ?>
