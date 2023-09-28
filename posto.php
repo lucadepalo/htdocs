@@ -26,7 +26,7 @@
 		$numForo = $_POST['numForo'];
 		$fk_linea = $_POST['fk_linea'];
 
-		$stmt = $conn->prepare("SELECT pk_posto, numForo, fk_linea FROM dispone WHERE fk_linea = ? AND fk_posto = ? AND numForo = ?");
+		$stmt = $conn->prepare("SELECT pk_posto, numForo, fk_linea FROM POSTO WHERE fk_linea = ? AND pk_posto = ? AND numForo = ?");
 		$stmt->bind_param("iii", $fk_linea, $pk_posto, $numForo);
 		$stmt->execute();
 		$stmt->store_result();
