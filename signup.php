@@ -1,8 +1,8 @@
 <?php
 	$servername = "localhost";
-    $username = "root";
-    $password = "";
-    $database = "cloud_simple";
+    	$username = "root";
+    	$password = "";
+    	$database = "cloud_simple";
 	 
 	$conn = new mysqli($servername, $username, $password, $database);
 	 
@@ -94,3 +94,4 @@
 		$response['message'] = 'i parametri richiesti non sono disponibili'; 
 		echo json_encode($response);
 	}
+?>
