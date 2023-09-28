@@ -1,8 +1,8 @@
 <?php
 	$servername = "localhost";
-	$username = "root";
-	$password = "";
-	$database = "cloud_simple";
+    $username = "root";
+    $password = "";
+    $database = "cloud_simple";
 	 
 	$conn = new mysqli($servername, $username, $password, $database);
 	 
@@ -40,7 +40,8 @@
 			$stmt->close();
 			$stmt = $conn->prepare("INSERT INTO `AZIENDA` 
 			(`pk_azienda`, `nome`, `login`, `pwd`, `lat`, `lon`, `cognome`, `email`, `emailVerificata`, `tipoUtente`, `sempreConnesso`) VALUES 
-			('', ?, ?, ?, NULL, NULL, ?, ?, 'F', NULL, NULL)");
+			(NULL, ?, ?, ?, NULL, NULL, ?, ?, 'F', NULL, NULL)");
+			
 			$stmt->bind_param("sssss", $nome, $username, $password, $cognome, $email);
 			
 			if($stmt->execute()){
@@ -60,10 +61,31 @@
 				);
 				
 				$stmt->close();
-				
-				$response['error'] = false; 
-				$response['message'] = 'Registrazione avvenuta con successo'; 
-				$response['user'] = $user; 
+
+				$stmt = $conn->prepare("SELECT `fk_azienda` FROM `CONTENITORE` WHERE `fk_azienda` = ?");
+				$stmt->bind_param("i", $id);
+				$stmt->execute();
+				$stmt->store_result();
+		
+				if($stmt->num_rows > 0){
+					$response['error'] = true;
+					$response['message'] = 'Contenitore già presente';
+					$stmt->close();
+				}else{
+					$stmt->close();
+					$stmt = $conn->prepare("INSERT INTO `CONTENITORE` (`pk_contenitore`, `numPosti`, `numContenitore`, `numLinee`, `fk_azienda`, `tipo_terreno`, `lat`, `lon`, `codice`, `modoFertirrigazione`, `lunghezza`, `larghezza`) VALUES ('1', '8', '1', '1', ?, 'medio', '0.00000000', '0.00000000', NULL, 'mm', NULL, NULL)");
+					$stmt->bind_param("i", $id);
+		
+					if($stmt->execute()){
+						$response['error'] = false;
+						$response['message'] = 'Registrazione avvenuta con successo'; 
+						$response['user'] = $user; 
+					} else {
+						$response['error'] = true;
+						$response['message'] = 'Errore nella aggiunta del contenitore';
+					}
+			$stmt->close();
+				}				
 			}
 		}
 		echo json_encode($response);
@@ -72,4 +94,3 @@
 		$response['message'] = 'i parametri richiesti non sono disponibili'; 
 		echo json_encode($response);
 	}
-?>
